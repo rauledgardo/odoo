@@ -87,7 +87,7 @@ class product_product(models.Model):
             loc_id = self.env["stock.location"].search([('mercadolibre_active','=',True),('company_id', '=', company.id)])
             if loc_id and len(loc_id)==0:
                 loc_id = False
-            if config.mercadolibre_stock_location_to_post_many:
+            if "mercadolibre_stock_location_to_post_many" in config._fields and config.mercadolibre_stock_location_to_post_many:
                 loc_id = []
                 for lid in config.mercadolibre_stock_location_to_post_many:
                     loc_id.append(lid)
@@ -120,9 +120,9 @@ class product_product(models.Model):
         qty_available = 0
         #_logger.info("meli_oerp_stock._meli_virtual_available quant_obj: "+str(quant_obj)+" product_id:"+str(product_id))
         for loc in loc_id:
-            #if company.mercadolibre_stock_virtual_available=='virtual':
-            _logger.info(loc.display_name)
-            if 1==1:
+            if ("mercadolibre_stock_virtual_available" in config._fields and (not config.mercadolibre_stock_virtual_available or config.mercadolibre_stock_virtual_available=='virtual')):
+            #_logger.info(loc.display_name)
+            #if 1==1:
                 qty_available+= quant_obj._get_available_quantity(product_id, loc)
             else:
                 qty_available+= product_id.get_theoretical_quantity( product_id.id, loc.id )

@@ -59,8 +59,8 @@ class ProductTemplateBindToMercadoLibre(models.TransientModel):
     _description = "Wizard de Product Template MercadoLibre Binder"
     _inherit = "ocapi.binder.wiz"
 
-    connectors = fields.Many2many("mercadolibre.account", string='MercadoLibre Accounts')
-    meli_id = fields.Char( string="MercadoLibre Product Id (MLXYYYYYYY: MLA123456789 )")
+    connectors = fields.Many2many("mercadolibre.account", string='MercadoLibre Accounts',help="Cuenta de mercadolibre origen de la publicación")
+    meli_id = fields.Char( string="MercadoLibre Products Ids",help="Ingresar uno o varios separados por coma: (MLXYYYYYYY: MLA123456789, MLA458..., ML...., ... )")
     bind_only = fields.Boolean( string="Bind only using SKU", help="Solo asociar producto y variantes usando SKU (No modifica el producto de Odoo)" )
     use_barcode = fields.Boolean( string="Use Barcode" )
 
@@ -84,11 +84,14 @@ class ProductTemplateBindToMercadoLibre(models.TransientModel):
                 bind_only = False
                 _logger.info(_("Check %s in %s") % (product.display_name, mercadolibre.name))
                 #Binding to
-                if self.meli_id:
-                    meli_id = self.meli_id
+                if self.meli_id:                                        
+                    meli_id = self.meli_id.split(",")
+                else:
+                    meli_id = [False]
                 if self.bind_only:
                     bind_only = self.bind_only
-                product.mercadolibre_bind_to( mercadolibre, meli_id=meli_id, bind_variants=True, bind_only=bind_only )                                 
+                for mid in meli_id:
+                    product.mercadolibre_bind_to( mercadolibre, meli_id=mid, bind_variants=True, bind_only=bind_only )                                 
                         
                 
     def product_template_remove_from_connector(self, context=None):
@@ -111,8 +114,11 @@ class ProductTemplateBindToMercadoLibre(models.TransientModel):
                 #Binding to                
                 meli_id = False
                 if self.meli_id:
-                    meli_id = self.meli_id
-                product.mercadolibre_unbind_from( account=mercadolibre, meli_id=meli_id )  
+                    meli_id = self.meli_id.split(",")
+                else:
+                    meli_id = [False]
+                for mid in meli_id:
+                    product.mercadolibre_unbind_from( account=mercadolibre, meli_id=mid )  
                 
 class ProductTemplateBindUpdate(models.TransientModel):
 

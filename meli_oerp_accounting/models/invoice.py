@@ -102,7 +102,7 @@ class Invoice(models.Model):
 
         #XMLbytes = base64.b64decode(self.attachment_file)
 
-        template = self.env.ref('account.account_invoices')
+        template = self.env.ref(report_invoices)
 
         try:
             if self.env.ref('l10n_co_cei.account_invoices_fe'):
@@ -119,18 +119,26 @@ class Invoice(models.Model):
             pass;
 
         if (template):
-            render_template = template.render_qweb_pdf([self.id])
+
+            render_template = report_render( res_ids=[self.id])
+
             #_logger.info(render_template)
             #PDFbytes = base64.b64decode(base64.b64encode(render_template[0]))
+
             if not PDFbytes:
                 PDFbytes = base64.b64encode(render_template[0])
+
             if not PDFName:
-                PDFName = re.sub(r'\W+', '', self.name) + '.pdf'            	
+                PDFName = re.sub(r'\W+', '', self.name or self.number) + '.pdf'
+
+            if ( 'sii_xml_dte' in self.env[acc_inv_model]._fields and self.sii_xml_dte ):
+                #XMLbytes = base64.b64encode( bytes(self.sii_xml_dte, "ascii") )
+                XMLbytes = base64.b64encode( bytes(self.sii_xml_dte, 'utf-8') )
+                XMLname = re.sub( r'\W+', '', self.name or self.number ) + '.xml'
+
             #_logger.info(PDFbytes)
             _logger.info(PDFName)
-
-
-
+            _logger.info(XMLname)
 
         return XMLname, XMLbytes, PDFName, PDFbytes
 
@@ -151,14 +159,16 @@ class OrdersInvoice(models.Model):
             so.meli_create_invoice( meli=meli, config=so.company_id )
 
 
-    def orders_post_invoice(self, context=None, meli=None):
+    def orders_post_invoice(self, context=None, meli=None, config=None):
         context = context or self.env.context
         _logger.info("orders_post_invoice: context: "+str(context))
 
         self.invoice_posted = False
 
         _logger.info("Create binary PDF and XML for attach files")
-        company = self.env.user.company_id
+        company = (config and 'company_id' in config._fields and config.company_id) or self.env.user.company_id
+        config = config or company
+
         if not meli:
             meli = self.env['meli.util'].get_new_instance(company)
 
@@ -208,8 +218,9 @@ class OrdersInvoice(models.Model):
                     #files = [ ('fiscal_document', ( PDFName, base64.b64decode(PDFbytes), 'application/pdf')) ]
                     #files = [ ('fiscal_document', ( XMLname, base64.b64decode(XMLbytes), 'application/xml') ]
 
+                do_not_send = ("mercadolibre_post_invoice_dont_send" in config._fields and config.mercadolibre_post_invoice_dont_send)
 
-                if meli and files and company.mercadolibre_post_invoice:
+                if meli and files and ( do_not_send == False ):
                     res = meli.uploadfiles("/packs/"+str(self.pack_id or self.order_id)+"/fiscal_documents", files=files, params={ "access_token": meli.access_token } )
                     _logger.info(res)
                     if res:

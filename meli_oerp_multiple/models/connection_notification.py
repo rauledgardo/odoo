@@ -28,6 +28,7 @@ import pdb
 import requests
 import json
 from ast import literal_eval
+import random
 
 #from .warning import warning
 try:
@@ -283,7 +284,7 @@ class MercadoLibreConnectionNotification(models.Model):
 
         hash = hashlib.md5()
         hash.update( base_str.encode() )
-        hexhash = str("i-")+hash.hexdigest()
+        hexhash = str("i-")+hash.hexdigest()+str("#")+str(int(random.random()*900000+100000))
 
         internals["processing_started"] = date_time
         internals["_id"] = hexhash

@@ -44,12 +44,14 @@ class stock_move(models.Model):
         company = self.env.user.company_id
         #_logger.info("company: "+str(company))
         #_logger.info("meli_oerp_stock >> stock.move _action_done ")
-        super( stock_move, self)._action_done(cancel_backorder=cancel_backorder)
+        ret = super( stock_move, self)._action_done(cancel_backorder=cancel_backorder)
         #_logger.info("meli_oerp_stock >> stock.move _action_done OK ")
         for st in self:
             #_logger.info("Moved products, put all this product stock state on batch for inmediate update: #"+str(len(st.product_id))+" >> "+str(st.product_id.ids) )
             for p in st.product_id:
                 _logger.info("post stock for: "+p.display_name)
+        
+        return ret
 
 
 class stock_location(models.Model):

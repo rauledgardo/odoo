@@ -166,6 +166,24 @@ class MercadoLibreConnectionConfiguration(models.Model):
     mercadolibre_stock_warehouse_full = fields.Many2one("stock.warehouse", string="Stock Warehouse Default for FULL", help="Almacen predeterminado para modo fulfillment")
     mercadolibre_stock_location_to_post_full = fields.Many2one("stock.location", string="Stock Location To Post for Full", help="Ubicación desde dónde publicar el stock en modo Full")
 
+    mercadolibre_order_confirmation_delivery = fields.Selection([ ("manual", "No entregar"),
+                                                ("paid_confirm_deliver", "Pagado > Entregar"),
+                                                ("paid_confirm_shipped_deliver", "Pagado > Entregado > Entregar")],
+                                                string='Acción al confirmar un pedido',
+                                                help='Acción al confirmar una orden o pedido de venta')
+
+    mercadolibre_order_confirmation_delivery_full = fields.Selection([ ("manual", "No entregar"),
+                                                ("paid_confirm_deliver", "Pagado > Entregar"),
+                                                ("paid_confirm_shipped_deliver", "Pagado > Entregado > Entregar")],
+                                                string='(FULL) Acción al confirmar un pedido',
+                                                help='(FULL) Acción al confirmar una orden o pedido de venta')
+
+    #TODO: activate
+    mercadolibre_stock_virtual_available = fields.Selection([("virtual","Virtual (quantity-reserved)"),("theoretical","En mano (quantity)")],default='virtual')
+
+    mercadolibre_stock_sku_mapping = fields.Many2many("meli_oerp.sku.rule",string="Sku Rules")
+
+
 
     ## ACCOUNT configuration
 
@@ -180,6 +198,27 @@ class MercadoLibreConnectionConfiguration(models.Model):
     mercadolibre_product_confirmation_hook = fields.Char(string="Product Hook",help="https://www.hookserver.com/app")
 
     mercadolibre_filter_order_datetime = fields.Datetime("Order Closed Date")
+
+
+    mercadolibre_order_confirmation_invoice = fields.Selection([ ("manual", "No facturar"),
+                                                ("paid_confirm_invoice", "Pagado > Facturar"),
+                                                ("paid_confirm_delivered_invoice", "Entregado > Facturar"),
+                                                #("paid_confirm_invoice_deliver", "Pagado > Facturar > Entregar")
+                                                ],
+                                                string='Acción al confirmar un pedido',
+                                                help='Acción al confirmar una orden o pedido de venta')
+
+    mercadolibre_order_confirmation_invoice_full = fields.Selection([ ("manual", "No facturar"),
+                                                ("paid_confirm_invoice", "Pagado > Facturar"),
+                                                ("paid_confirm_delivered_invoice", "Entregado > Facturar"),
+                                                #("paid_confirm_invoice_deliver", "Pagado > Facturar > Entregar")
+                                                ],
+                                                string='(FULL) Acción al confirmar un pedido',
+                                                help='(FULL) Acción al confirmar una orden o pedido de venta')
+
+    mercadolibre_post_invoice = fields.Boolean(string="Post Invoice Automatic",help="Try to post invoice, when order is revisited or refreshed.")
+    mercadolibre_post_invoice_dont_send = fields.Boolean(string="Dont really send, just prepare to post invoice.")
+
 
     def copy_from_company( self, context=None, company=None ):
         context = context or self.env.context

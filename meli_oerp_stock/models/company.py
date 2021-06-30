@@ -43,8 +43,20 @@ class ResCompany(models.Model):
     mercadolibre_stock_warehouse_full = fields.Many2one("stock.warehouse", string="Stock Warehouse Default for FULL", help="Almacen predeterminado para modo fulfillment")
     mercadolibre_stock_location_to_post_full = fields.Many2one("stock.location", string="Stock Location To Post for Full", help="Ubicación desde dónde publicar el stock en modo Full")
 
+    mercadolibre_order_confirmation_delivery = fields.Selection([ ("manual", "No entregar"),
+                                                ("paid_confirm_deliver", "Pagado > Entregar"),
+                                                ("paid_confirm_shipped_deliver", "Pagado > Entregado > Entregar")],
+                                                string='Acción al confirmar un pedido',
+                                                help='Acción al confirmar una orden o pedido de venta')
+
+    mercadolibre_order_confirmation_delivery_full = fields.Selection([ ("manual", "No entregar"),
+                                                ("paid_confirm_deliver", "Pagado > Entregar"),
+                                                ("paid_confirm_shipped_deliver", "Pagado > Entregado > Entregar")],
+                                                string='(FULL) Acción al confirmar un pedido',
+                                                help='(FULL) Acción al confirmar una orden o pedido de venta')
+
     #TODO: activate
-    #mercadolibre_stock_virtual_available = fields.Selection([("virtual","Virtual (quantity-reserved)"),("theoretical","En mano (quantity)")],default='virtual')
+    mercadolibre_stock_virtual_available = fields.Selection([("virtual","Virtual (quantity-reserved)"),("theoretical","En mano (quantity)")],default='virtual')
 
     #TODO: activate
     #mercadolibre_stock_sku_regex = fields.Char(string="Sku Regex")
@@ -57,3 +69,5 @@ class ResCompany(models.Model):
     #mercadolibre_shipped = fields.Boolean()
 
     #warehouse para shipment.logictic_type diferentes, usar reglas... publicar en full
+    #mercadolibre_stock_sale_route_process = fields.Boolean(string="Routing Sale")
+    #mercadolibre_stock_mrp_production_process = fields.Boolean(string="Process Manufacturing Productions",default=False,index=True)

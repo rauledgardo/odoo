@@ -9,7 +9,7 @@
               <xpath expr="//group[@name='autopost']" position="after">
                   <group string="Configuración Stock" name="meli_oerp_stock"  col="2">
                     <group>
-                      <!--field name="mercadolibre_stock_virtual_available"/-->
+                      <field name="mercadolibre_stock_virtual_available" invisible="0"/>
                       <field name="mercadolibre_stock_warehouse" invisible="0"/>
                       <field name="mercadolibre_stock_location_to_post" invisible="0"  domain = "[('mercadolibre_active','=',True),('company_id', '=', id)]"/>
                       <!--field name="mercadolibre_stock_location_to_post_many" invisible="0" domain = "[('mercadolibre_active','=',True)]"/-->
@@ -19,7 +19,13 @@
                       <field name="mercadolibre_stock_location_to_post_full" invisible="0"  domain = "[('mercadolibre_logistic_type','=','fulfillment'),'|',('mercadolibre_active','=',True),('company_id', '=', id)]"/>
                     </group>
                     <group>
-                      <!--field name="mercadolibre_stock_sku_mapping" invisible="0"/-->
+                      <field name="mercadolibre_order_confirmation_delivery" invisible="0"/>
+                    </group>
+                    <group>
+                      <field name="mercadolibre_order_confirmation_delivery_full" invisible="0"/>
+                    </group>
+                    <group>
+                      <field name="mercadolibre_stock_sku_mapping" invisible="0"/>
                     </group>
                   </group>
                </xpath>

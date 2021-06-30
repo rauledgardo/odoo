@@ -276,7 +276,7 @@ class product_template(models.Model):
         for productT in self:
             for bindT in productT.mercadolibre_bindings:
                 r = bindT.product_template_post_stock(meli=meli)
-        res.append(r)
+                res.append(r)
         return res
 
 

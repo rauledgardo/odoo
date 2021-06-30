@@ -36,7 +36,7 @@ class SaleOrder(models.Model):
 
     def action_invoice_create(self, grouped=False, final=False):
 
-        _invoices = super(SaleOrder,self)._create_invoices(grouped,final)
+        _invoices = order_create_invoices( super(SaleOrder,self), grouped, final )
 
         #Colombia pragmatic
         for order in self:
@@ -59,7 +59,8 @@ class SaleOrder(models.Model):
     # TODO check meli_status_brief: if (self.meli_status_brief and "delivered" in self.meli_status_brief
         if so.state in ['sale','done']:
             #cond = so.invoice_status not in ['invoiced','no','upselling']
-            cond = True and abs(so.meli_paid_amount - so.amount_total)<0.1
+            received_amount = so.meli_paid_amount
+            cond = True and abs( received_amount - so.amount_total ) < 1.0
             dones = False
             cancels = False
             drafts = False
@@ -83,9 +84,16 @@ class SaleOrder(models.Model):
 
                 if dones:
                     _logger.info("Creating invoice...")
-                    invoices = self.env[acc_inv_model].search([(invoice_origin,'=',so.name)])
+                    invoices = self.env[acc_inv_model].search( [(invoice_origin,'=',so.name)] )
 
                     if not invoices:
+                        _logger.info("Fixing order to invoice")
+                        if so.invoice_status in ['invoiced']:
+                            so.invoice_status = 'to invoice'
+                        for oline in so.order_line:
+                            oline.qty_invoiced = 0.0
+                            oline.qty_to_invoice = oline.product_uom_qty
+                            oline.invoice_status = 'to invoice'
                         _logger.info("Creating invoices")
                         result = so.action_invoice_create()
                         _logger.info("result:"+str(result))
@@ -100,9 +108,18 @@ class SaleOrder(models.Model):
                                 inv.action_post()
                                 _logger.info("Created invoices and validated!")
 
-                            #if inv.state in ['open']:
-                            #    _logger.info("Send to Producteca: "+str(inv.name))
-                            #    inv.orders_post_invoice()
+                            if inv.state in posted_statuses and config and config.mercadolibre_post_invoice:
+                                _logger.info("Send to MercadoLibre: "+str(inv.name))
+                                mo = so and so.meli_orders and so.meli_orders[0]
+                                if mo:
+                                    mo.invoice_created = True
+                                    try:
+                                        mo.orders_post_invoice( meli=meli, config=config )
+                                    except Exception as e:
+                                        _logger.info("Post To ML Invoice Exception")
+                                        _logger.error(e, exc_info=True)
+                                        pass;
+
 
                             #except:
                                 #inv.message_post()

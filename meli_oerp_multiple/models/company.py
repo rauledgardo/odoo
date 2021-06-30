@@ -64,12 +64,15 @@ class ResCompany(models.Model):
     def meli_query_orders(self):
         _logger.info("meli_oerp_multiple >> meli_query_orders")
         company = self or self.env.user.company_id
+        result = []
         for comp in company:
-
+            res = {}
             for account in comp.mercadolibre_connections:
 
                 _logger.info('meli_query_orders for: ' +str(comp.name) + str(" >> ") + str(account.name))
-                account.meli_query_orders()
+                res = account.meli_query_orders()
+                if (res):
+                    result.append(res)
 
         return result
 

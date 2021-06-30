@@ -50,8 +50,9 @@ class stock_move(models.Model):
                 _logger.info(internals)
                 noti = self.env["mercadolibre.notification"].start_internal_notification( internals=internals, account=account )      
                 _logger.info(noti)          
-        except:
-            raise ValidationError("Error creando proceso de actualizacion de stock de MercadoLibre, intente nuevamente en unos sergundos.")
+        except Exception as e:
+            _logger.error(e, exc_info=True)
+            raise ValidationError("Error creando proceso de actualizacion de stock de MercadoLibre, intente nuevamente en unos sergundos. Error: "+str(e))
                 
                 
                 

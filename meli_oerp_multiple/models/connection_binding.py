@@ -1240,7 +1240,7 @@ class MercadoLibreConnectionBindingSaleOrderPayment(models.Model):
 
 class MercadoLibreConnectionBindingSaleOrderShipmentItem(models.Model):
 
-    _name = "mercadolibre.shipment.item"
+    _name = "mercadolibre.bind_shipment.item"
     _description = "Ocapi Sale Order Shipment Item"
     _inherit = ["ocapi.binding.shipment.item", "mercadolibre.shipment.item"]
 
@@ -1259,7 +1259,7 @@ class MercadoLibreConnectionBindingSaleOrderShipment(models.Model):
     connection_account = fields.Many2one( "mercadolibre.account", string="MercadoLibre Account" )
 
     order_id = fields.Many2one("mercadolibre.sale_order",string="Order")
-    products = fields.One2many("mercadolibre.shipment.item", "shipping_id", string="Product Items")
+    products = fields.One2many("mercadolibre.bind_shipment.item", "shipping_id", string="Product Items")
 
 class MercadoLibreConnectionBindingSaleOrderClient(models.Model):
 
@@ -1295,7 +1295,7 @@ class MercadoLibreConnectionBindingSaleOrder(models.Model):
 
     lines = fields.One2many("mercadolibre.sale_order_line","order_id", string="Order Items")
     payments = fields.One2many("mercadolibre.payment","order_id",string="Order Payments")
-    shipments = fields.One2many("mercadolibre.shipment","order_id",string="Order Shipments")
+    shipments = fields.One2many("mercadolibre.bind_shipment","order_id",string="Order Shipments")
 
 
     def orders_query_iterate( self, offset=0, account=None, meli=None, context=None ):

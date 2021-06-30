@@ -50,6 +50,27 @@ class SaleOrder(models.Model):
                 order.type_id = order_type["type_id"]
                 _logger.info("order_type:"+str(order_type))
 
+    def meli_deliver( self, meli=None, config=None, data=None):
+        _logger.info("meli_deliver")
+        if self.picking_ids:
+            for spick in self.picking_ids:
+                _logger.info(spick)
+                if (spick.move_line_ids):
+                    _logger.info(spick.move_line_ids)
+                    if (len(spick.move_line_ids)>=1):
+                        for pop in spick.move_line_ids:
+                            _logger.info(pop)
+                            if (pop.qty_done==0.0 and pop.product_qty>=0.0):
+                                pop.qty_done = pop.product_qty
+                        _logger.info("do_new_transfer")
+                        try:
+                            spick.button_validate()
+                            spick.action_done()
+                        except Exception as e:
+                            _logger.error("stock pick button_validate error"+str(e))
+                            res = { 'error': str(e) }
+                            pass;
+
     def _meli_get_warehouse_id( self, config=None ):
 
         company = (config and 'company_id' in config._fields and config.company_id) or self.env.user.company_id
@@ -71,6 +92,21 @@ class SaleOrder(models.Model):
         config = config or company
 
         self._meli_order_update( config=config )
+
+        delinofull = "mercadolibre_order_confirmation_delivery" in config._fields and config.mercadolibre_order_confirmation_delivery
+        delifull = "mercadolibre_order_confirmation_delivery_full" in config._fields and config.mercadolibre_order_confirmation_delivery_full
+
+        condition = self.meli_shipment_logistic_type=="fulfillment" and delifull and "paid_confirm_deliver" in delifull
+        condition = condition or (self.meli_shipment_logistic_type=="" and delinofull and  "paid_confirm_deliver" in delinofull)
+
+        condition = condition or (self.meli_shipment_logistic_type=="fulfillment" and self.meli_shipment and "delivered" in self.meli_shipment.status and delifull and "paid_confirm_shipped_deliver" in delifull)
+        condition = condition or (self.meli_shipment_logistic_type=="" and self.meli_shipment and  "delivered" in self.meli_shipment.status and delinofull and  "paid_confirm_shipped_deliver" in delinofull )
+        #last check:
+        condition = condition and ("paid" in self.meli_status) and self.state in ['sale','done']
+
+        _logger.info("delivery condition: "+str(condition))
+        if (condition):
+            self.meli_deliver( meli=meli, config=config)
 
         super(SaleOrder, self).confirm_ml( meli=meli, config=config )
 
@@ -214,11 +250,12 @@ class MercadolibreOrder(models.Model):
         if wh_id:
             meli_order_fields.update({'warehouse_id': wh_id.id })
         _logger.info("prepare_sale_order_vals > meli_order_fields:"+str(meli_order_fields))
+
         return meli_order_fields
 
-#[22:35, 30/04/2021] Clemmy: cancelled ship-delivered
-#[22:35, 30/04/2021] Clemmy: cancelled ship-not_deliveredreturned_to_hub
-#[22:35, 30/04/2021] Clemmy: cancelled ship-not_deliveredreturning_to_sender
-#[22:35, 30/04/2021] Clemmy: DEVUELTES
-#[22:36, 30/04/2021] Clemmy: ni siquiera salio
-#[22:36, 30/04/2021] Clemmy: cancelled ship-cancelled
+#cancelled ship-delivered
+#cancelled ship-not_deliveredreturned_to_hub
+#cancelled ship-not_deliveredreturning_to_sender
+#DEVUELTES
+#ni siquiera salio
+#cancelled ship-cancelled

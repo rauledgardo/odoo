@@ -845,7 +845,7 @@ class MercadoLibreConnectionAccount(models.Model):
             _logger.info("account updating stock #" + str(len(product_bind_ids)) + " on " + str(account.name))
             icommit = 0
             icount = 0
-            topcommits = 40
+            topcommits = 10
             maxcommits = len(product_bind_ids)
             internals = {
                 "application_id": account.client_id,
@@ -2030,12 +2030,12 @@ class MercadoLibreConnectionAccount(models.Model):
 
                 _logger.info(shpfields)
                 _logger.info("Searching MercadoLibre Shipment: " + str(shpid))
-                oshp = self.env["mercadolibre.shipment"].sudo().search([( 'conn_id', '=', shpid ),
+                oshp = self.env["mercadolibre.bind_shipment"].sudo().search([( 'conn_id', '=', shpid ),
                                                                     ('order_id','=',pso.id),
                                                                     ("connection_account","=",account.id)])
                 if not oshp:
                     _logger.info("Creating mercadolibre shipment record")
-                    oshp = self.env["mercadolibre.shipment"].sudo().create( shpfields )
+                    oshp = self.env["mercadolibre.bind_shipment"].sudo().create( shpfields )
                 else:
                     _logger.info("Updating mercadolibre shipment record")
                     oshp.write( shpfields )
