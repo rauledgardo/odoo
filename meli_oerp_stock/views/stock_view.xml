@@ -14,5 +14,19 @@
                </xpath>
             </field>
         </record>
+        
+        <!--record id="view_sale_order_form_meli_stock" model="ir.ui.view">
+            <field name="name">sale.order.form.meli.stock</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="meli_oerp.view_sale_order_form_meli"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='meli_shipment']" position="before">
+                  <button name="meli_produce" 
+                    string="Producir"  
+                    type="object" class="oe_highlight"  />
+
+                </xpath>
+            </field>
+        </record-->
     </data>
 </odoo>

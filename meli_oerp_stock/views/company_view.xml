@@ -27,6 +27,11 @@
                     <group>
                       <field name="mercadolibre_stock_sku_mapping" invisible="0"/>
                     </group>
+                    <group>
+                      <!--field name="mercadolibre_stock_mrp_production_process" invisible="0"/-->
+                      <field name="mercadolibre_stock_filter_order_datetime" invisible="0"/>
+                      <field name="mercadolibre_stock_filter_order_datetime_to" invisible="0"/>                      <field name="mercadolibre_stock_warehouse" invisible="0"/>
+                    </group>
                   </group>
                </xpath>
             </field>

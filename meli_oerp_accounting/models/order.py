@@ -36,7 +36,7 @@ class SaleOrder(models.Model):
 
     def action_invoice_create(self, grouped=False, final=False):
 
-        _invoices = order_create_invoices( super(SaleOrder,self), grouped, final )
+        _invoices = order_create_invoices( super(SaleOrder,self), grouped=grouped, final=final )
 
         #Colombia pragmatic
         for order in self:
@@ -59,7 +59,7 @@ class SaleOrder(models.Model):
     # TODO check meli_status_brief: if (self.meli_status_brief and "delivered" in self.meli_status_brief
         if so.state in ['sale','done']:
             #cond = so.invoice_status not in ['invoiced','no','upselling']
-            received_amount = so.meli_paid_amount
+            received_amount = so.meli_amount_to_invoice( meli=meli, config=config )
             cond = True and abs( received_amount - so.amount_total ) < 1.0
             dones = False
             cancels = False
@@ -128,7 +128,8 @@ class SaleOrder(models.Model):
                             #    raise;
                 else:
                     _logger.info("Creating invoices not processed, shipment not complete: dones:"+str(False)+" drafts: "+str(drafts)+" cancels:"+str(cancels))
-
+            else:
+                _logger.error("meli_create_invoice > conditions not met.")
         _logger.info("meli_oerp_accounting meli_create_invoice ended.")
 
     def confirm_ml( self, meli=None, config=None ):
@@ -142,8 +143,22 @@ class SaleOrder(models.Model):
                 for meli_order in self.meli_orders:
                     for payment in meli_order.payments:
                         try:
-                            if config.mercadolibre_process_payments_customer and not payment.account_payment_id:
-                                payment.create_payment()
+                            if config.mercadolibre_process_payments_customer:
+
+                                if 1==2 and payment.account_payment_id:
+                                    fix = payment.account_payment_id and (payment.transaction_amount!=payment.total_paid_amount)
+                                    fix = fix and (payment.account_payment_id.amount!=payment.transaction_amount)
+                                    fix = fix and str(payment.account_payment_id.payment_date) == '2021-07-05'
+
+                                    if (fix):
+                                        _logger.info("payment fixing: "+str(payment.account_payment_id))
+                                        #self.account_payment_id.cancel()
+                                        payment.account_payment_id.action_draft()
+                                        payment.account_payment_id.unlink()
+                                        payment.account_payment_id = False
+
+                                if not payment.account_payment_id:
+                                    payment.create_payment( meli=meli, config=config )
                         except Exception as e:
                             _logger.info("Error creating customer payment")
                             _logger.info(e, exc_info=True)

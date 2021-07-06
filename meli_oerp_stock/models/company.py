@@ -55,6 +55,10 @@ class ResCompany(models.Model):
                                                 string='(FULL) Acción al confirmar un pedido',
                                                 help='(FULL) Acción al confirmar una orden o pedido de venta')
 
+    #TODO: process
+    mercadolibre_stock_filter_order_datetime = fields.Datetime("Order Closed Date (For shipping)")
+    mercadolibre_stock_filter_order_datetime_to = fields.Datetime("Order Closed Date To (For shipping)")
+
     #TODO: activate
     mercadolibre_stock_virtual_available = fields.Selection([("virtual","Virtual (quantity-reserved)"),("theoretical","En mano (quantity)")],default='virtual')
 
@@ -67,7 +71,10 @@ class ResCompany(models.Model):
     #TODO:
     #si shipped que haga automaticamente ejecute la entrega
     #mercadolibre_shipped = fields.Boolean()
+    #mercadolibre_stock_filter_order_datetime = fields.Datetime("Order Closed Date (For shipping)")
+    #mercadolibre_stock_filter_order_datetime_to = fields.Datetime("Order Closed Date To (For shipping)")
 
-    #warehouse para shipment.logictic_type diferentes, usar reglas... publicar en full
+    #procesar cuando es "Comprar"
     #mercadolibre_stock_sale_route_process = fields.Boolean(string="Routing Sale")
-    #mercadolibre_stock_mrp_production_process = fields.Boolean(string="Process Manufacturing Productions",default=False,index=True)
+    #producir
+    mercadolibre_stock_mrp_production_process = fields.Boolean(string="Process Manufacturing Productions",default=False,index=True)
