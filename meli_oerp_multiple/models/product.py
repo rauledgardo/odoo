@@ -225,13 +225,14 @@ class product_template(models.Model):
                 if new_pub:
                     meli_id = None
                     _logger.info("Creating new pub")
-                elif not productT.mercadolibre_bindings and productT.meli_pub_as_variant and productT.meli_pub_as_variant.meli_id:
-                    _logger.info("Auto binding old pub and update it")
-                    meli_id = productT.meli_pub_as_variant.meli_id
-                    for variant in productT.product_variant_ids:
-                        if variant.meli_id:
-                            meli_id = meli_id or variant.meli_id
-                    _logger.info("Auto binding old pub and update it: meli_id: "+str(meli_id))
+                elif not productT.mercadolibre_bindings:
+                    if productT.meli_pub_as_variant:
+                        _logger.info("Auto binding old pub and update it")
+                        meli_id = productT.meli_pub_principal_variant and productT.meli_pub_principal_variant.meli_id
+                        for variant in productT.product_variant_ids:
+                            if variant.meli_id:
+                                meli_id = meli_id or variant.meli_id
+                        _logger.info("Auto binding old pub and update it: meli_id: "+str(meli_id))
 
                 if productT.meli_pub_as_variant:
                     #create new binding template
