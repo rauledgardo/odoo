@@ -313,7 +313,7 @@ class MercadoLibreConnectionBindingProductTemplate(models.Model):
         return ret
 
     def product_template_post_stock( self, context=None, meli_id=None, meli=None, account=None ):
-        _logger.info("template product_template_update >> MercadoLibre Product template Update")
+        _logger.info("product_template_post_stock >> MercadoLibre Product Template Post Stock")
         ret = {}
         for bindT in self:
 
@@ -326,6 +326,23 @@ class MercadoLibreConnectionBindingProductTemplate(models.Model):
 
             for bindv in bindT.variant_bindings:
                 bindv.product_post_stock(meli=meli)
+
+        return ret
+
+    def product_template_post_price( self, context=None, meli_id=None, meli=None, account=None ):
+        _logger.info("product_template_post_price >> MercadoLibre Product Template Post Prices")
+        ret = {}
+        for bindT in self:
+
+            account = bindT.connection_account
+            product = bindT.product_tmpl_id
+            meli_id = bindT.conn_id
+
+            if not meli:
+                meli = self.env['meli.util'].get_new_instance( account.company_id, account )
+
+            for bindv in bindT.variant_bindings:
+                bindv.product_post_price(meli=meli)
 
         return ret
 

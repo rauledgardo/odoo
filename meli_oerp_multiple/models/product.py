@@ -311,10 +311,24 @@ class product_template(models.Model):
         res = []
         for productT in self:
             for bindT in productT.mercadolibre_bindings:
-                r = bindT.product_template_post_stock(meli=meli)
-                res.append(r)
+                condition = not account
+                condition = condition or (account and bindT.connection_account and account.id == bindT.connection_account.id )
+                if condition:
+                    r = bindT.product_template_post_stock(meli=meli,account=account)
+                    res.append(r)
         return res
 
+    def product_template_post_price( self, context=None, meli=None, account=None ):
+        _logger.info("producte.template: product_template_post_price")
+        res = []
+        for productT in self:
+            for bindT in productT.mercadolibre_bindings:
+                condition = not account
+                condition = condition or (account and bindT.connection_account and account.id == bindT.connection_account.id )
+                if condition:
+                    r = bindT.product_template_post_price(meli=meli,account=account)
+                    res.append(r)
+        return res
 
 
 class product_product(models.Model):

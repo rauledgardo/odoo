@@ -5,6 +5,7 @@ from odoo import models, fields, api, _
 from odoo import api, models, fields
 import logging
 from odoo.exceptions import UserError
+from .warning import warning
 
 _logger = logging.getLogger(__name__)
 
@@ -289,27 +290,48 @@ class ProductTemplatePostExtended(models.TransientModel):
         warningobj = self.env['warning']
 
         res = {}
-
+        
+        _logger.info("context in product_template_post:")
+        _logger.info(self.env.context)
+        custom_context = {
+            'connectors': self.connectors,
+            'force_meli_new_pub': self.force_meli_new_pub,
+            
+            'force_meli_pub': self.force_meli_pub,
+            'force_meli_active': self.force_meli_active,
+            'post_stock': self.post_stock,
+            'post_price': self.post_price
+        }
+        posted_products = 0
         for product_id in product_ids:
-
+            
             productT = product_obj.browse(product_id)
 
-            for mercadolibre in self.connectors:
-                comp = mercadolibre.company_id or company
-                meli = self.env['meli.util'].get_new_instance( comp, mercadolibre )
+            for account in self.connectors:
+                comp = account.company_id or company
+                meli = self.env['meli.util'].get_new_instance( comp, account )
                 if meli:
                     if meli.need_login():
                         return meli.redirect_login()
-                    res = productT.with_context(
-                                                {
-                                                    'connectors': self.connectors,
-                                                    'force_meli_new_pub': self.force_meli_new_pub,
-                                                    'force_meli_pub': self.force_meli_pub,
-                                                    'force_meli_active': self.force_meli_active
-                                                }
-                                                ).product_template_post( context=None, account=mercadolibre, meli=meli )
+                    #res = productT.with_context(custom_context).product_template_post( context=None, account=account, meli=meli )
+                    
+                    if (self.force_meli_pub and not productT.meli_pub):
+                        productT.meli_pub = True
+                    if (productT.meli_pub):
+    
+                        if self.post_stock:
+                            res = productT.with_context(custom_context).product_template_post_stock(meli=meli,account=account)
+                        if self.post_price:
+                            res = productT.with_context(custom_context).product_template_post_price(meli=meli,account=account)
+                        if not self.post_stock and not self.post_price:
+                            res = productT.with_context(custom_context).product_template_post(context=None, account=account, meli=meli)
+
                     if res and 'name' in res:
                         return res
+                    posted_products+=1
+                    
+        if (posted_products==0 and not 'name' in res):
+            res = warningobj.info( title='MELI WARNING', message="Se intentaron publicar 0 productos. Debe forzar las publicaciones o marcar el producto con el campo Meli Publication, debajo del titulo.", message_html="" )
 
         return res
 
