@@ -86,9 +86,12 @@ class ResCompany(models.Model):
             for account in comp.mercadolibre_connections:
 
                 _logger.info('calling meli_query_get_questions for: ' +str(comp.name) + str(" >> ") + str(account.name))
-                res = account.meli_query_get_questions()
-                if (res):
-                    result.append(res)
+                config = account and account.configuration
+
+                if config and config.mercadolibre_cron_get_questions:
+                    res = account.meli_query_get_questions()
+                    if (res):
+                        result.append(res)
 
         return result
 

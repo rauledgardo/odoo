@@ -60,9 +60,8 @@ class ResCompany(models.Model):
     mercadolibre_stock_filter_order_datetime = fields.Datetime("Order Closed Date (Forcing shipment validation)")
     mercadolibre_stock_filter_order_datetime_to = fields.Datetime("Order Closed Date To (Forcing shipment validation)")
 
-    #TODO: activate
     mercadolibre_stock_virtual_available = fields.Selection([("virtual","Virtual (quantity-reserved)"),("theoretical","En mano (quantity)")],default='virtual')
-    #mercadolibre_stock_virtual_available = fields.Selection([("virtual","Virtual Available"),("virtual_reserved","Virtual ( on hand - reserved )"),("theoretical","En mano (quantity)")],default='virtual')
+    #TODO: check if 3rd option needed to force quantity - reserved mercadolibre_stock_virtual_available = fields.Selection([("virtual","Virtual Available"),("virtual_reserved","Virtual ( on hand - reserved )"),("theoretical","En mano (quantity)")],default='virtual')
 
     #TODO: activate
     #mercadolibre_stock_sku_regex = fields.Char(string="Sku Regex")

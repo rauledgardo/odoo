@@ -81,7 +81,7 @@ class SaleOrder(models.Model):
                             _logger.error("stock pick button_validate/action_done error"+str(e))
                             res = { 'error': str(e) }
                             pass;
-                        
+
                         try:
                             spick.action_assign()
                             spick.button_validate()
@@ -130,18 +130,18 @@ class SaleOrder(models.Model):
         return wh_id
 
     def confirm_ml_stock( self, meli=None, config=None, force=False ):
-        
+
         _logger.info("meli_oerp_stock confirm_ml_stock")
         company = (config and 'company_id' in config._fields and config.company_id) or self.env.user.company_id
         config = config or company
-        
+
         forcing_date = False
         forcing_date = config and config.mercadolibre_stock_filter_order_datetime and self.meli_date_closed >= config.mercadolibre_stock_filter_order_datetime
         forcing_date = forcing_date and config.mercadolibre_stock_filter_order_datetime_to and self.meli_date_closed <= config.mercadolibre_stock_filter_order_datetime_to
-        
+
         force = force or forcing_date
         _logger.info("Forcing shipment validation: "+str(force))
-        
+
         self._meli_order_update( config=config )
 
         delinofull = "mercadolibre_order_confirmation_delivery" in config._fields and config.mercadolibre_order_confirmation_delivery
@@ -151,7 +151,7 @@ class SaleOrder(models.Model):
 
         condition = self.meli_shipment_logistic_type=="fulfillment" and delifull and "paid_confirm_deliver" in delifull
         condition = condition or (not self.meli_shipment_logistic_type and delinofull and  "paid_confirm_deliver" in delinofull)
-        
+
         condition = condition or (self.meli_shipment_logistic_type=="fulfillment" and shipped_or_delivered and delifull and "paid_confirm_shipped_deliver" in delifull)
         condition = condition or (self.meli_shipment_logistic_type=="" and shipped_or_delivered and delinofull and  "paid_confirm_shipped_deliver" in delinofull )
         #last check:
@@ -160,14 +160,14 @@ class SaleOrder(models.Model):
         _logger.info("delivery condition: "+str(condition))
         if (condition or force):
             self.meli_deliver( meli=meli, config=config)
-            
+
         _logger.info("meli_oerp_stock confirm_ml_stock ended")
 
     #try to update order before confirmation (quotation)
     def confirm_ml( self, meli=None, config=None ):
-        
-        _logger.info("meli_oerp_stock confirm_ml")
-        
+
+        _logger.info("meli_oerp_stock confirm_ml: config:"+str(config and config.name))
+
         company = (config and 'company_id' in config._fields and config.company_id) or self.env.user.company_id
         config = config or company
 

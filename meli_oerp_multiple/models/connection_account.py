@@ -153,9 +153,9 @@ class MercadoLibreConnectionAccount(models.Model):
                 _logger.info("account config mercadolibre_cron_get_orders")
                 connacc.meli_query_orders()
 
-            if (config.mercadolibre_cron_get_questions):
-                _logger.info("account config mercadolibre_cron_get_questions")
-                connacc.meli_query_get_questions()
+            #if (config.mercadolibre_cron_get_questions):
+            #    _logger.info("account config mercadolibre_cron_get_questions")
+            #    connacc.meli_query_get_questions()
 
 
     def cron_meli_process( self ):

@@ -860,11 +860,11 @@ class product_product(models.Model):
         if not posting_id:
             posting = self.env['mercadolibre.posting'].create((posting_fields))
             posting_id = posting.id
-            if (posting):
-                posting.posting_query_questions()
+            #if (posting):
+            #    posting.posting_query_questions()
         else:
             posting.write({'product_id':product.id })
-            posting.posting_query_questions()
+            #posting.posting_query_questions()
 
         b_search_nonfree_ship = False
         if ('shipping' in rjson):

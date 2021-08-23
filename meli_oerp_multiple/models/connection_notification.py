@@ -325,7 +325,7 @@ class MercadoLibreConnectionNotification(models.Model):
 
                     if (rsjson and 'error' in rsjson):
                         noti.state = 'FAILED'
-                        noti.processing_errors = str(rsjson['error'])
+                        noti.processing_errors = str(('message' in rsjson and rsjson['message']) or rsjson['error'])
                         _logger.error("meli_oerp_multiple >> _process_notification_question >> rsjson error: "+noti.processing_errors)
                     else:
                         noti.state = 'SUCCESS'
