@@ -34,6 +34,11 @@ class MeliPayment(models.Model):
     def create_payment( self, meli=None, config=None ):
         self.ensure_one()
 
+        if not config:
+            config = (self.order_id and self.order_id.company_id) or (self.order_id and self.order_id.sale_order and self.order_id.sale_order.company_id) or self.env.user.company_id
+            if not config:
+                return None
+
         if self.account_payment_id:
             raise ValidationError('Ya esta creado el pago')
         if self.status != 'approved':

@@ -391,11 +391,28 @@ class SaleOrderLine(models.Model):
     #here we must use Many2one more accurate, there is no reason to have more than one binding (more than one account and more than one item/order associated to one sale order line)
     mercadolibre_bindings = fields.Many2one( "mercadolibre.sale_order_line", string="MercadoLibre Connection Bindings" )
 
+
+class AccountMove(models.Model):
+
+    _inherit = "account.move"
+
+    def meli_global_invoice_fix_status(self):
+        
+        for inv in self:
+            for iline in inv.invoice_line_ids:
+                order = iline.meli_sale_id
+                if order:
+                    for oli in order.order_line:
+                        oli.qty_invoiced = oli.qty_to_invoice
+                        oli.invoice_status = "invoiced"
+                    order.invoice_status = "invoiced"
+
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
     meli_sale_id = fields.Many2one("sale.order",string="Orden ML")
     meli_sale_name = fields.Char(string="Label ML")
+    meli_sale_invoice_status = fields.Selection(string="Invoice",related="meli_sale_id.invoice_status")
 
 class ResPartner(models.Model):
 

@@ -111,6 +111,17 @@ class MercadoLibreConnectionBindingProductTemplate(models.Model):
     meli_shipping_mode = fields.Char(string="Shipping Mode",help="Shipping modes (por usuario): custom, not_specified, me2. https://api.mercadolibre.com/users/USERID/shipping_preferences",index=True)
     meli_shipping_method = fields.Char(string="Shipping Method",help="Shipping methods: https://api.mercadolibre.com/sites/SITEID/shipping_methods",index=True)
 
+    def meli_status_compute( self ):
+        for bindT in self:
+            st = None
+            sst = None
+            for bindv in bindT.variant_bindings:
+                st = st or bindv.meli_status
+                sst = sst or bindv.meli_sub_status
+            bindT.meli_status = str(st)+"-"+str(sst)
+
+    meli_status = fields.Char(string="Status ML", compute=meli_status_compute )
+
     def product_template_post( self, context=None, meli_id=None, meli=None, account=None, product_variant=None ):
         context = context or self.env.context
         _logger.info("MercadoLibre Product template Post context: "+str(context)+" meli_id: "+str(meli_id)+" account: "+str(account))
@@ -330,6 +341,8 @@ class MercadoLibreConnectionBindingProductTemplate(models.Model):
             product = bindT.product_tmpl_id
             meli_id = bindT.conn_id
             stock = 0
+            stock_update = ""
+            stock_error = ""
 
             if not meli:
                 meli = self.env['meli.util'].get_new_instance( account.company_id, account )
@@ -337,8 +350,12 @@ class MercadoLibreConnectionBindingProductTemplate(models.Model):
             for bindv in bindT.variant_bindings:
                 bindv.product_post_stock(meli=meli)
                 stock+= (bindv.stock or bindv.meli_available_quantity)
+                stock_error+= str(bindv.stock_error)
+                stock_update = bindv.stock_update
 
             bindT.stock = stock
+            bindT.stock_error = stock_error
+            bindT.stock_update = stock_update
 
         return ret
 
@@ -1035,6 +1052,7 @@ class MercadoLibreConnectionBindingProductVariant(models.Model):
     def action_category_predictor( self ):
         _logger.info("MercadoLibre Product action_category_predictor")
 
+    #VARIANT binding product_post_stock
     def product_post_stock( self, context=None, meli=None ):
         _logger.info("MercadoLibre Product product_post_stock: context: "+str(context)+" meli: "+str(meli))
         for bindv in self:
@@ -1067,6 +1085,8 @@ class MercadoLibreConnectionBindingProductVariant(models.Model):
                         res = { "error": "fulfillment"}
                         bindv.stock_error = str(res)
                         _logger.info(bindv.stock_error)
+                        if bindv.stock>0 and bindv.meli_status not in ['active']:
+                            bindv.product_meli_status_active(meli=meli)
                         return res
                 if bindv.product_id and not bindv.product_id.active:
                     res = { "error": "product archived"}

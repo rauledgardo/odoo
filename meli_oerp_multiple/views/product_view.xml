@@ -23,6 +23,8 @@
                   <field name="conn_id"/>
                   <field name="price" />
                   <field name="stock" />
+                  <field name="stock_update" />
+                  <field name="stock_error" />
                   <field name="meli_shipping_logistic_type"/>
                 </group>
               </group>
@@ -104,6 +106,7 @@
                     <field name="image_update" optional="hide"/>
                     <field name="price_update" optional="hide"/>
                     <field name="stock_update" optional="hide"/>
+                    <field name="stock_error" optional="hide"/>
                   </tree>
                 </field>
                 <separator string="Descripcion del producto en ML" colspan="1"/>
@@ -181,6 +184,8 @@
                 <field name="conn_variation_id"/>
                 <field name="price" />
                 <field name="stock" />
+                <field name="stock_update" />
+                <field name="stock_error" />
                 <field name="meli_shipping_logistic_type"/>
               </group>
               <br/>
@@ -351,6 +356,7 @@
                             <field name="connection_account"/>
                             <field name="name"/>
                             <field name="sku"/>
+                            <!--field name="meli_status"/-->
                             <!--field name="barcode"/-->
                             <field name="conn_id" string="MercadoLibre Id"/>
                             <field name="conn_variation_id"  string="Variant Id"/>
@@ -370,6 +376,8 @@
                         <field name="connection_account"/>
                         <field name="name"/>
                         <field name="sku"/>
+                        <field name="meli_status"/>
+                        <field name="meli_sub_status"/>
                         <!--field name="barcode"/-->
                         <field name="conn_id" string="MercadoLibre Id"/>
                         <field name="conn_variation_id"  string="Variant Id"/>
@@ -427,6 +435,7 @@
                         <field name="connection_account"/>
                         <field name="name"/>
                         <field name="sku"/>
+                        <field name="meli_status"/>
                         <!--field name="barcode"/-->
                         <field name="conn_id" string="MercadoLibre Id"/>
                       </tree>
@@ -455,6 +464,7 @@
       		</search>
       	</field>
       </record>
+
       <!--Search view - Product Product -->
       <record id="mercadolibre_products_search_view" model="ir.ui.view">
       	<field name="name">Product Variants - Search</field>
@@ -473,6 +483,7 @@
       		</search>
       	</field>
       </record>
+
       <!--Search view - Product Template Bindings only -->
       <record id="mercadolibre_bindings_product_template_search_view" model="ir.ui.view">
       	<field name="name">Product Bindings - Search</field>
@@ -497,6 +508,7 @@
       		</search>
       	</field>
       </record>
+
       <!--Search view - Product Bindings only -->
       <record id="mercadolibre_bindings_product_search_view" model="ir.ui.view">
       	<field name="name">Product Variants Bindings - Search</field>
@@ -537,6 +549,7 @@
       		</tree>
       	</field>
       </record>
+
       <!--Tree view - Product -->
       <record id="view_mercadolibre_product_tree" model="ir.ui.view">
       	<field name="name">mercadolibre.product.tree</field>
@@ -550,6 +563,7 @@
       		</tree>
       	</field>
       </record>
+
       <!--Tree view - Product Template Binding -->
       <record id="view_mercadolibre_bindings_product_template_tree" model="ir.ui.view">
       	<field name="name">mercadolibre.product_template.tree</field>
@@ -568,6 +582,7 @@
       		</tree>
       	</field>
       </record>
+
       <!--Tree view - Product Binding -->
       <record id="view_mercadolibre_bindings_product_tree" model="ir.ui.view">
       	<field name="name">mercadolibre.product.tree</field>

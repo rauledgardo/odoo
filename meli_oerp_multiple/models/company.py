@@ -126,3 +126,62 @@ class ResCompany(models.Model):
 
                 _logger.info('cron_meli_process_internal_jobs for: ' +str(comp.name) + str(" >> ") + str(account.name))
                 account.cron_meli_process_internal_jobs()
+
+
+    def cron_meli_process_post_stock( self, meli=None ):
+
+        company = self or self.env.user.company_id
+        warningobj = self.pool.get('warning')
+
+        for comp in company:
+
+            for account in comp.mercadolibre_connections:
+                config = account.configuration
+                if (config.mercadolibre_cron_post_update_stock):
+                    _logger.info("config.mercadolibre_cron_post_update_stock")
+                    account.meli_update_remote_stock(meli=meli)
+
+    def cron_meli_process_post_price( self, meli=None ):
+
+        company = self or self.env.user.company_id
+        warningobj = self.pool.get('warning')
+
+        for comp in company:
+
+            for account in comp.mercadolibre_connections:
+                config = account.configuration
+                if (config.mercadolibre_cron_post_update_price):
+                    _logger.info("config.mercadolibre_cron_post_update_stock")
+                    account.meli_update_remote_price(meli=meli)
+
+
+
+    def cron_meli_process_post_products( self, meli=None ):
+
+        company = self or self.env.user.company_id
+        warningobj = self.pool.get('warning')
+
+        for comp in company:
+
+            for account in comp.mercadolibre_connections:
+                config = account.configuration
+                if (config.mercadolibre_cron_post_update_products or config.mercadolibre_cron_post_new_products):
+                    _logger.info("config.mercadolibre_cron_post_update_products or config.mercadolibre_cron_post_new_products")
+                    account.meli_update_remote_products(post_new=config.mercadolibre_cron_post_new_products)
+
+    def cron_meli_process_get_products( self, meli=None ):
+
+        company = self or self.env.user.company_id
+        warningobj = self.pool.get('warning')
+
+        for comp in company:
+
+            for account in comp.mercadolibre_connections:
+                config = account.configuration
+                if (config.mercadolibre_cron_get_update_products):
+                    _logger.info("config.mercadolibre_cron_get_update_products")
+                    account.meli_update_local_products()
+
+                if (config.mercadolibre_cron_get_new_products):
+                    _logger.info("config.mercadolibre_cron_get_new_products")
+                    account.product_meli_get_products()

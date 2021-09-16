@@ -207,7 +207,7 @@ class MercadoLibreConnectionConfiguration(models.Model):
     mercadolibre_product_confirmation_hook = fields.Char(string="Product Hook",help="https://www.hookserver.com/app")
 
     mercadolibre_filter_order_datetime = fields.Datetime("Order Closed Date")
-
+    mercadolibre_filter_order_datetime_to = fields.Datetime("Order Closed Date To")
 
     mercadolibre_order_confirmation_invoice = fields.Selection([ ("manual", "No facturar"),
                                                 ("paid_confirm_invoice", "Pagado > Facturar"),

@@ -2220,9 +2220,13 @@ class product_product(models.Model):
                             if target:
                                 #WARNING; will change the publication id variation?
                                 if (str(target.conn_variation_id)!=str(target_meli_id_variation)):
-                                    reserror =  { "error": "Changing binding variant meli_id:"+str(target.conn_id)+" conn_id_variation: " + str(target.conn_variation_id) + " target_meli_id_variation: " + str(target_meli_id_variation) }
-                                    _logger.error(reserror)
-                                    return reserror
+                                    if (seller_sku==product.default_code):
+                                        reserror =  { "warning": "Changing binding variant meli_id:"+str(target.conn_id)+" conn_id_variation: " + str(target.conn_variation_id) + " TO target_meli_id_variation: " + str(target_meli_id_variation) }
+                                        _logger.warning(reserror)
+                                    else:
+                                        reserror =  { "error": "Changing binding variant meli_id:"+str(target.conn_id)+" conn_id_variation: " + str(target.conn_variation_id) + " TO target_meli_id_variation: " + str(target_meli_id_variation)+" different seller_sku! Need to check!" }
+                                        _logger.error(reserror)
+                                        return reserror
                                 target.meli_id_variation = str(target_meli_id_variation)
                                 target.conn_variation_id = str(target_meli_id_variation)
                             var = {

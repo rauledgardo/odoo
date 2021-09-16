@@ -490,6 +490,14 @@ class SaleOrderGlobalInvoice(models.TransientModel):
             if len(inv_fields["invoice_line_ids"]):
                 _logger.info("fields:"+str(fields))
                 invoice.write(inv_fields)
+                
+                for iline in invoice.invoice_line_ids:
+                    order = iline.meli_sale_id
+                    if order:
+                        for oli in order.order_line:
+                            oli.qty_invoiced = oli.qty_to_invoice
+                            oli.invoice_status = "invoiced"
+                        order.invoice_status = "invoiced"
 
         except Exception as e:
             _logger.info("order_update > Error creando factura global")
